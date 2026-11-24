@@ -6,6 +6,7 @@ from .consolidation import (
 )
 from .revise import RevisionError, revise
 from .service import process
+from .snapshot import MaterializationError, materialize
 
 __all__ = [
     'process',
@@ -14,4 +15,6 @@ __all__ = [
     'consolidate',
     'ConsolidationError',
     'ConsolidationLimitError',
+    'materialize',
+    'MaterializationError',
 ]

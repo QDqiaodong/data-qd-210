@@ -54,7 +54,7 @@ except RevisionError as exc:
 python -I examples/run_revision.py
 ```
 
-已通过 46 项业务测试（含修订流水线 39 项），并核对非法输入拒绝；样例数据
+已通过 98 项业务测试（含 `process`、修订流水线、目录归并与双时间快照），并核对非法输入拒绝；样例数据
 全部原创合成，见 [来源](fixtures/SOURCES.md)。
 
 ## 多来源目录归并（`consolidate`）
@@ -66,10 +66,37 @@ python -I examples/run_revision.py
 结构、上限与确定性保证见 [归并契约](docs/consolidation.md)。
 
 ```python
-from citation_lineage import consolidate
+from citation_lineage import consolidate, materialize
 
 outcome = consolidate(catalogs, identity_claims)
 lineage = outcome["process"]  # 无可发布文献时为 None/JSON null
+```
+
+## 双时间发布快照（`materialize`）
+
+`materialize(data, assertions, queries)` 在固定档案目录之上，按业务时间与
+知识时间两个独立时间轴回答审计问题：某个业务时点哪些材料有效，以及截至某个
+知识截止时间已经掌握哪些声明。它只让 `recorded_at <= known_at` 的声明可见，
+在同实体的纠正 DAG（`supersedes`）上求当前前沿，再按左闭右开的业务区间判定
+`available` / `withdrawn` / `unknown` / `conflict`，绝不按记录时间、ID 或
+输入顺序对冲突擅自决胜。后来补录、业务生效更早的撤回或纠正不会污染旧知识截止
+的快照。
+
+每个快照给出文献与引用的当前状态及前沿/覆盖声明证据、规范 `documents` /
+`citations`、端点阻断与引用自身撤回/缺证/冲突的分类证据，以及现有 `process`
+对规范目录计算的完整结果；没有可发布文献时 `process` 为 `null` 但审计证据
+完整。字段、纠正 DAG 校验、输出结构、确定性与性能边界见
+[双时间快照契约](docs/snapshot.md)。
+
+```python
+from citation_lineage import MaterializationError, materialize
+
+try:
+    result = materialize(data, assertions, queries)
+except MaterializationError as exc:  # ValueError 子类，整次调用失败
+    ...
+snapshots = result["snapshots"]      # 按 query_id 稳定排序
+registry = result["assertions"]      # 完整声明注册表，快照按 ID 引用
 ```
 
 ## 边界
