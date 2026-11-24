@@ -1,0 +1,31 @@
+{
+  "documents": [
+    {
+      "id": "d1",
+      "date": "1900",
+      "title": "Source"
+    },
+    {
+      "id": "d2",
+      "date": "1910",
+      "title": "Edition"
+    },
+    {
+      "id": "d3",
+      "date": "1920",
+      "title": "Study"
+    }
+  ],
+  "citations": [
+    {
+      "from": "d2",
+      "to": "d1",
+      "page": "p10"
+    },
+    {
+      "from": "d3",
+      "to": "d2",
+      "page": "p4"
+    }
+  ]
+}
