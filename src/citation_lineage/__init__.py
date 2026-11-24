@@ -4,12 +4,16 @@ from .consolidation import (
     ConsolidationLimitError,
     consolidate,
 )
+from .handoff import HandoffError, manifest_sha256, prepare_handoff
 from .revise import RevisionError, revise
 from .service import process
 from .snapshot import MaterializationError, materialize
 
 __all__ = [
     'process',
+    'prepare_handoff',
+    'HandoffError',
+    'manifest_sha256',
     'revise',
     'RevisionError',
     'consolidate',

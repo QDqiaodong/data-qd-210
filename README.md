@@ -54,7 +54,7 @@ except RevisionError as exc:
 python -I examples/run_revision.py
 ```
 
-已通过 98 项业务测试（含 `process`、修订流水线、目录归并与双时间快照），并核对非法输入拒绝；样例数据
+已通过 112 项业务测试（含 `process`、修订流水线、目录归并、双时间快照与离线移交编排），并核对非法输入拒绝；样例数据
 全部原创合成，见 [来源](fixtures/SOURCES.md)。
 
 ## 多来源目录归并（`consolidate`）
@@ -97,6 +97,23 @@ except MaterializationError as exc:  # ValueError 子类，整次调用失败
     ...
 snapshots = result["snapshots"]      # 按 query_id 稳定排序
 registry = result["assertions"]      # 完整声明注册表，快照按 ID 引用
+```
+
+## 离线档案移交编排（`prepare_handoff`）
+
+`prepare_handoff(data, request, acknowledgements)` 从 seed 集合计算
+`cited_ancestors` 引用闭包，把每个强连通分量作为不可拆分的原子单元，按成员 ID
+字典序和文献数/字节双容量限制生成确定性批次，并依据 manifest 匹配的连续回执
+前缀决定已确认文献、引用与 `next_batch`。超限原子单元返回 `orderable=False`
+和结构化 `violations`；非法回执抛 `ValueError`。批次摘要使用规范紧凑 JSON 的
+SHA-256，调用方可独立复算。闭包、装箱、回执与 manifest 规则见
+[移交契约](docs/handoff.md)。
+
+```python
+from citation_lineage import prepare_handoff
+
+handoff = prepare_handoff(data, request, acknowledgements)
+next_batch = handoff["next_batch"]
 ```
 
 ## 边界
