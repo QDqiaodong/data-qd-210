@@ -57,6 +57,21 @@ python -I examples/run_revision.py
 已通过 46 项业务测试（含修订流水线 39 项），并核对非法输入拒绝；样例数据
 全部原创合成，见 [来源](fixtures/SOURCES.md)。
 
+## 多来源目录归并（`consolidate`）
+
+`consolidate(catalogs, identity_claims)` 用显式 `same` / `different` 声明把多个
+合作方的本地文献和引用投影为一份规范目录。它会保留别名、逐字段来源观察、选择
+依据、身份/字段冲突分量、阻断引用、内部引用证据与多来源聚合定位，并在
+`process` 字段中返回现有谱系结果；没有可发布文献时该字段为 `null`。规则、输出
+结构、上限与确定性保证见 [归并契约](docs/consolidation.md)。
+
+```python
+from citation_lineage import consolidate
+
+outcome = consolidate(catalogs, identity_claims)
+lineage = outcome["process"]  # 无可发布文献时为 None/JSON null
+```
+
 ## 边界
 
 业务结果仅覆盖契约中定义的有限模型。后续需求可沿已有身份和证据字段扩展，不把当前样例当成行业标准或生产认证。

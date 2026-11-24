@@ -6,4 +6,6 @@ documents为1..1000个唯一ASCII id、date/title非空字符串（最多256代�
 
 在已发布结果之上按批次修订引用关系（新增/撤销定位、原子提交、版本谱系、重放与逐文献深度）由独立的 `revise` API 承担，契约见 [revision.md](revision.md)；本文件的 `process` 输入输出契约保持不变，修订版本的完整谱系仍由 `process` 逐版本计算。
 
+从多个合作方的本地目录和显式身份声明生成可交给 `process` 的规范目录，由独立的 `consolidate` API 承担，契约见 [consolidation.md](consolidation.md)；该 API 不修改或放宽本文件中的 `process` 文献、引用与 ID 限制。
+
 输出documents按id、citations按from/to/page排序。保留所有定位原文；不做全文索引、博客CMS、图书借阅或文献CRUD界面。后续异文来源证据、版次身份及时间约束可复用document/citation locator与可达结果，当前无OCR、外部目录或自动真实性判断。API错误抛ValueError；IO重复键拒绝、原子新建结果、不覆盖已有文件或链接。
