@@ -1,5 +1,6 @@
-import unittest,json
+import unittest,json,pathlib,sys
 from pathlib import Path
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'src'))
 from citation_lineage import process
 class Regression(unittest.TestCase):
  def test_cycle_depth_and_long_chain(self):

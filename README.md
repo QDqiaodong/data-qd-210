@@ -31,7 +31,31 @@ publish("run/another.json", process(load("fixtures/input.json")))
 {"citations": 2, "cycles": 0, "documents": 3, "max_depth": 2, "roots": 1}
 ```
 
-已通过 7 项业务测试，并核对非法输入拒绝；样例数据全部原创合成，见 [来源](fixtures/SOURCES.md)。
+## 引用修订流水线（`revise`）
+
+`revise(data, batches)` 在已发布引用关系之上按顺序应用修订批次，每批原子
+生效，并为初始版本与每个已接受版本保留完整的 `process` 谱系结果、逐文献
+`document_depths`、实际新增/撤销定位与相对前一版本的影响集合。批次校验、
+重放/身份冲突、跨循环边界深度与失败隔离规则见
+[修订契约](docs/revision.md)。
+
+```python
+from citation_lineage import RevisionError, revise
+
+try:
+    outcome = revise(data, batches)
+except RevisionError as exc:
+    outcome = exc.result   # 已接受版本、failure 与 unprocessed_batches
+```
+
+合成演示（含一次故意构造的原子拒绝）：
+
+```sh
+python -I examples/run_revision.py
+```
+
+已通过 46 项业务测试（含修订流水线 39 项），并核对非法输入拒绝；样例数据
+全部原创合成，见 [来源](fixtures/SOURCES.md)。
 
 ## 边界
 

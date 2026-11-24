@@ -1,5 +1,6 @@
-import json,unittest,copy
+import json,unittest,copy,pathlib,sys
 from pathlib import Path
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'src'))
 from citation_lineage import process
 class T(unittest.TestCase):
  def setUp(self):self.d=json.loads(Path('fixtures/input.json').read_text())
