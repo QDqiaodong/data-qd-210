@@ -146,6 +146,39 @@ process_after = result["process_after"]  # 全部处置时为 None
 python -I examples/run_disposition.py
 ```
 
+## 固化副本修复规划（`plan_preservation`）
+
+`plan_preservation(data, assets, sites, replicas, request)` 在规范引用图之上，
+为一组重点文献及其沿引用方向可达的全部被引证据，共同求解满足故障域分散要求的
+数字载体修复计划。副本状态只由本次输入确定：站点 `online` 且观测摘要等于登记
+摘要才是 `healthy`，摘要不一致为 `corrupt`，站点离线或观测摘要为 `null` 为
+`unavailable`；不做多数表决，corrupt/unavailable 副本不能作为读取源但可作为
+`replace` 目标。
+
+每个仍缺的故障域恰好规划一个动作，目标已有损坏/不可读记录时为 `replace`、否则
+为 `create`；已有 healthy 域不消耗站点 slot。规划对整个保护闭包共同求解，站点
+`write_slots` 是所有文献动作共享的全局容量——逐文献贪心可能让局部低成本站点耗尽
+后续文献唯一可用站点的 slot，因此实现使用向量费用最小费用流：先最小化总
+`write_cost`，再按完整动作键字典序唯一决胜。无 healthy 源、单篇故障域不足或全局
+slot 容量不可行时返回 `status="blocked"` 与结构化 `violations`，绝不给出部分动作。
+字段、副本状态、阻断分类与确定性保证见 [固化副本契约](docs/preservation.md)。
+
+```python
+from citation_lineage import PreservationError, plan_preservation
+
+try:
+    plan = plan_preservation(data, assets, sites, replicas, request)
+except PreservationError:  # ValueError 子类，整次调用失败
+    ...
+if plan["status"] == "planned":
+    actions = plan["actions"]
+    total_cost = plan["total_write_cost"]
+```
+
+```sh
+python -I examples/run_preservation.py
+```
+
 ## 边界
 
 业务结果仅覆盖契约中定义的有限模型。后续需求可沿已有身份和证据字段扩展，不把当前样例当成行业标准或生产认证。

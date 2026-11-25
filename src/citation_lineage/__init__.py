@@ -6,6 +6,7 @@ from .consolidation import (
 )
 from .disposition import DispositionError, assess_disposition
 from .handoff import HandoffError, manifest_sha256, prepare_handoff
+from .preservation import PreservationError, plan_preservation
 from .revise import RevisionError, revise
 from .service import process
 from .snapshot import MaterializationError, materialize
@@ -24,4 +25,6 @@ __all__ = [
     'MaterializationError',
     'assess_disposition',
     'DispositionError',
+    'plan_preservation',
+    'PreservationError',
 ]
