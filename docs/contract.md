@@ -12,4 +12,6 @@ documents为1..1000个唯一ASCII id、date/title非空字符串（最多256代�
 
 在本文件的规范引用图与 `cited_ancestors` 闭包之上，生成满足文献数/字节上限、强连通分量原子性和回执连续前缀要求的可续传离线移交批次，由独立的 `prepare_handoff` API 承担，契约见 [handoff.md](handoff.md)；该 API 同样不修改调用方输入。
 
+把保管期限、法律保全（`active` / `released` hold）与引用证据依赖合并为可审计的处置决定，由独立的 `assess_disposition` API 承担，契约见 [disposition.md](disposition.md)；该 API 复用本文件的规范引用图与 `cited_ancestors` 语义，不修改调用方输入，也不放宽本文件的任何 `process` 限制。`data` 中的 `date` 仍是不解释的档案标签，处置评估不得据此推断保管期限。
+
 输出documents按id、citations按from/to/page排序。保留所有定位原文；不做全文索引、博客CMS、图书借阅或文献CRUD界面。后续异文来源证据、版次身份及时间约束可复用document/citation locator与可达结果，当前无OCR、外部目录或自动真实性判断。API错误抛ValueError；IO重复键拒绝、原子新建结果、不覆盖已有文件或链接。

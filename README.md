@@ -54,7 +54,7 @@ except RevisionError as exc:
 python -I examples/run_revision.py
 ```
 
-已通过 112 项业务测试（含 `process`、修订流水线、目录归并、双时间快照与离线移交编排），并核对非法输入拒绝；样例数据
+已通过 151 项业务测试（含 `process`、修订流水线、目录归并、双时间快照、离线移交编排与处置评估），并核对非法输入拒绝；样例数据
 全部原创合成，见 [来源](fixtures/SOURCES.md)。
 
 ## 多来源目录归并（`consolidate`）
@@ -114,6 +114,36 @@ from citation_lineage import prepare_handoff
 
 handoff = prepare_handoff(data, request, acknowledgements)
 next_batch = handoff["next_batch"]
+```
+
+## 保管期限与引用证据联动的处置评估（`assess_disposition`）
+
+`assess_disposition(data, records, holds, request)` 把保管期限、法律保全（hold）
+与引用证据依赖合并成一个可审计的处置决定：给定一批拟销毁文献和评估时点
+`as_of`，逐候选给出稳定决定及**全部**直接原因，并返回处置后的规范目录与
+`process` 谱系。
+
+文献自身过期不代表可以处置：所有非候选文献，以及候选中永久保留、尚未过期或
+处于 active hold 的文献构成保留锚点，每个锚点沿引用方向可达的全部被引文献都须
+保留。该判断针对整次请求共同完成——一个被保管期或 hold 阻止的候选会成为锚点并
+继续保护它引用的候选，跨级引用链与循环同样服从闭包规则。每个引用证据阻断都给
+出确定性的最短定位见证（最小可达锚点 + 字典序最小的最少边定位序列），保留实际
+页码。字段、含截止日口径、失败边界与确定性保证见
+[处置契约](docs/disposition.md)。
+
+```python
+from citation_lineage import DispositionError, assess_disposition
+
+try:
+    result = assess_disposition(data, records, holds, request)
+except DispositionError:  # ValueError 子类，整次调用失败
+    ...
+allowed = result["allowed_document_ids"]
+process_after = result["process_after"]  # 全部处置时为 None
+```
+
+```sh
+python -I examples/run_disposition.py
 ```
 
 ## 边界

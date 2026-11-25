@@ -4,6 +4,7 @@ from .consolidation import (
     ConsolidationLimitError,
     consolidate,
 )
+from .disposition import DispositionError, assess_disposition
 from .handoff import HandoffError, manifest_sha256, prepare_handoff
 from .revise import RevisionError, revise
 from .service import process
@@ -21,4 +22,6 @@ __all__ = [
     'ConsolidationLimitError',
     'materialize',
     'MaterializationError',
+    'assess_disposition',
+    'DispositionError',
 ]
